@@ -8,13 +8,15 @@ interface IProps {
   activity: IActivity;
   createActivity: (activity: IActivity) => void;
   editActivity: (activity: IActivity) => void;
+  submitting: boolean;
 }
 
 export const ActivityForm: React.FC<IProps> = ({
   setEditMode,
   activity: initialFormState,
   createActivity,
-  editActivity
+  editActivity,
+  submitting,
 }) => {
   const initializeForm = () => {
     if (initialFormState) {
@@ -31,8 +33,10 @@ export const ActivityForm: React.FC<IProps> = ({
     };
   };
   const [activity, setActivity] = useState<IActivity>(initializeForm);
-  const handleInputChange = (event: FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const {name, value} = event.currentTarget;
+  const handleInputChange = (
+    event: FormEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = event.currentTarget;
     setActivity({
       ...activity,
       [name]: value,
@@ -42,13 +46,13 @@ export const ActivityForm: React.FC<IProps> = ({
     if (activity.id.length === 0) {
       let newActivity = {
         ...activity,
-        id: uuid()
-      }
+        id: uuid(),
+      };
       createActivity(newActivity);
     } else {
       editActivity(activity);
     }
-  }
+  };
   return (
     <Segment clearing>
       <Form onSubmit={handleSubmit}>
@@ -90,7 +94,13 @@ export const ActivityForm: React.FC<IProps> = ({
           placeholder="Venue"
           value={activity.venue}
         />
-        <Button floated="right" positive type="submit" content="Submit" />
+        <Button
+          loading={submitting}
+          floated="right"
+          positive
+          type="submit"
+          content="Submit"
+        />
         <Button
           floated="right"
           type="button"
