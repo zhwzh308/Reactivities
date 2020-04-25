@@ -12,18 +12,24 @@ class ActivityStore {
   @observable submitting = false;
   @observable target = "";
   @computed get activitiesByDate() {
-    return this.groupActivitiesByDate(Array.from(this.activityRegistry.values()));
+    return this.groupActivitiesByDate(
+      Array.from(this.activityRegistry.values())
+    );
   }
   groupActivitiesByDate(activities: IActivity[]) {
     const sortedActivities = activities.sort(
       (a, b) => Date.parse(a.date) - Date.parse(b.date)
     );
-    return Object.entries(sortedActivities.reduce((activities, activity) => {
-      const date = activity.date.split('T')[0];
-      const array = activities[date] ? [...activities[date], activity] : [activity];
-      activities[date] = array;
-      return activities;
-    }, {} as {[key: string]: IActivity[]}));
+    return Object.entries(
+      sortedActivities.reduce((activities, activity) => {
+        const date = activity.date.split("T")[0];
+        const array = activities[date]
+          ? [...activities[date], activity]
+          : [activity];
+        activities[date] = array;
+        return activities;
+      }, {} as { [key: string]: IActivity[] })
+    );
   }
   @action loadActivities = async () => {
     this.loadingInitial = true;
@@ -35,7 +41,6 @@ class ActivityStore {
           this.activityRegistry.set(a.id, a);
         });
       });
-      console.log(this.groupActivitiesByDate(activities));
     } catch (error) {
       console.error(error);
     } finally {
@@ -47,15 +52,24 @@ class ActivityStore {
     if (activity) {
       this.activity = activity;
     } else {
-      await this.loadActivities();
-      runInAction('gettin activity', () => {
-        this.activity = this.getActivity(id);
-      })
+      this.loadingInitial = true;
+      try {
+        activity = await agent.Activities.details(id);
+        runInAction("getting activity", () => {
+          this.activity = activity;
+        });
+      } catch (error) {
+        console.error(error);
+      } finally {
+        runInAction("getting activity", () => {
+          this.loadingInitial = false;
+        });
+      }
     }
   };
   @action clearActivity = () => {
     this.activity = null;
-  }
+  };
   getActivity = (id: string) => {
     return this.activityRegistry.get(id) ?? null;
   };
