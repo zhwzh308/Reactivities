@@ -6,7 +6,6 @@ import { RouteComponentProps } from "react-router-dom";
 import { Form as FinalForm, Field } from "react-final-form";
 import { ActivityFormValues } from "../../../../app/models/activity";
 import { TextInput } from "../../../../app/common/form/TextInput";
-import ActivityStore from "../../../../app/stores/activityStore";
 import { TextAreaInput } from "../../../../app/common/form/TextAreaInput";
 import { SelectInput } from "../../../../app/common/form/SelectInput";
 import { category } from "../../../../app/common/options/categoryOptions";
@@ -18,6 +17,7 @@ import {
   composeValidators,
   hasLengthGreaterThan,
 } from "revalidate";
+import { RootStoreContext } from "../../../../app/stores/rootStore";
 
 const validate = combineValidators({
   title: isRequired({ message: "The event title is required" }),
@@ -41,7 +41,7 @@ interface DetailParams {
 export const ActivityForm: React.FC<RouteComponentProps<
   DetailParams
 >> = observer(({ match, history }) => {
-  const activityStore = useContext(ActivityStore);
+  const { activityStore } = useContext(RootStoreContext);
   const { submitting, loadActivity } = activityStore;
   const [activity, setActivity] = useState(new ActivityFormValues());
   const handleFinalFormSubmit = (values: any) => {

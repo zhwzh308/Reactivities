@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useContext, useEffect } from "react";
 import { Container } from "semantic-ui-react";
 import "./styles.css";
 import { NavBar } from "../../features/nav/NavBar";
@@ -15,11 +15,26 @@ import { ActivityForm } from "../../features/nav/activities/form/ActivityForm";
 import { ActivityDetails } from "../../features/nav/activities/details/ActivityDetails";
 import NotFound from "./NotFound";
 import { ToastContainer } from "react-toastify";
+import { LoginForm } from "../../features/user/LoginForm";
+import { RootStoreContext } from "../stores/rootStore";
+import { LoadingComponent } from "./LoadingComponent";
+import { ModalContainer } from "../common/modals/ModalContainer";
 
 const App: React.FC<RouteComponentProps> = ({ location }) => {
+  const { commonStore, userStore } = useContext(RootStoreContext);
+  const { appLoaded, setAppLoaded, token } = commonStore;
+  const { getUser } = userStore;
+  useEffect(() => {
+    if (token) getUser().finally(setAppLoaded);
+    else setAppLoaded();
+  }, [getUser, token, setAppLoaded]);
+  if (!appLoaded) {
+    return <LoadingComponent content="Loading app..." />;
+  }
   return (
     <Fragment>
-      <ToastContainer position='bottom-right' />
+      <ModalContainer />
+      <ToastContainer position="bottom-right" />
       <Route exact path="/" component={HomePage} />
       <Route
         path={"/(.+)"}
@@ -40,6 +55,7 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
                     path={["/createActivity", "/manage/:id"]}
                     component={ActivityForm}
                   />
+                  <Route path="/login" component={LoginForm} />
                   <Route component={NotFound} />
                 </Switch>
               </Container>
