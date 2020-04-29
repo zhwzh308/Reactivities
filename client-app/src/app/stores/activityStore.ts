@@ -5,6 +5,7 @@ import agent from "../api/agent";
 import { history } from "../..";
 import { toast } from "react-toastify";
 import { RootStore } from "./rootStore";
+import { setActivityProps, createAttendee } from "../common/util/util";
 
 export default class ActivityStore {
   rootStore: RootStore;
@@ -16,6 +17,7 @@ export default class ActivityStore {
   }
   @observable activityRegistry = new Map<string, IActivity>();
   @observable loadingInitial = false;
+  @observable loading = false;
   @observable activity: IActivity | null = null;
   @observable submitting = false;
   @observable target = "";
@@ -41,11 +43,13 @@ export default class ActivityStore {
   }
   @action loadActivities = async () => {
     this.loadingInitial = true;
+    const { userStore } = this.rootStore;
+    const { user } = userStore;
     try {
       const activities = await agent.Activities.list();
       runInAction("loading activities", () => {
         activities.forEach((a) => {
-          a.date = new Date(a.date);
+          setActivityProps(a, user!);
           this.activityRegistry.set(a.id, a);
         });
       });
@@ -64,12 +68,9 @@ export default class ActivityStore {
       this.loadingInitial = true;
       try {
         activity = await agent.Activities.details(id);
-        if (activity) {
-          activity.date = new Date(activity.date);
-        }
         runInAction("getting activity", () => {
-          this.activity = activity;
           if (activity) {
+            setActivityProps(activity, this.rootStore.userStore.user!);
             this.activityRegistry.set(activity.id, activity);
           }
         });
@@ -93,6 +94,12 @@ export default class ActivityStore {
     this.submitting = true;
     try {
       await agent.Activities.create(activity);
+      const attendee = createAttendee(this.rootStore.userStore.user!);
+      attendee.isHost = true;
+      let attendees = [];
+      attendees.push(attendee);
+      activity.isHost = true;
+      activity.attendees = attendees;
       runInAction("creating activity", () => {
         this.activityRegistry.set(activity.id, activity);
         this.submitting = false;
@@ -100,7 +107,7 @@ export default class ActivityStore {
       history.push(`/activities/${activity.id}`);
     } catch (error) {
       console.error(error.response);
-      toast.error('Problem submitting data');
+      toast.error("Problem submitting data");
     } finally {
       runInAction(() => {
         this.submitting = false;
@@ -118,7 +125,7 @@ export default class ActivityStore {
       history.push(`/activities/${activity.id}`);
     } catch (error) {
       console.error(error.response);
-      toast.error('Problem submitting data');
+      toast.error("Problem submitting data");
     } finally {
       runInAction(() => {
         this.submitting = false;
@@ -151,5 +158,50 @@ export default class ActivityStore {
   };
   @action openEditForm = (id: string) => {
     this.activity = this.getActivity(id);
+  };
+  @action attendActivity = async () => {
+    const attendee = createAttendee(this.rootStore.userStore.user!);
+    if (this.activity) {
+      this.loading = true;
+      const id = this.activity.id;
+      try {
+        await agent.Activities.attend(id);
+        runInAction(() => {
+          if (this.activity) {
+            this.activity.attendees.push(attendee);
+            this.activity.isGoing = true;
+            this.activityRegistry.set(this.activity.id, this.activity);
+          }
+        });
+      } catch (error) {
+        console.error(error);
+        toast.error('Problem signing up to activity');
+      } finally {
+        runInAction(() => (this.loading = false));
+      }
+    }
+  };
+  @action cancelAttendance = async () => {
+    if (this.activity) {
+      this.loading = true;
+      const id = this.activity.id;
+      try {
+        await agent.Activities.unattend(id);
+        runInAction(() => {
+          if (this.activity) {
+            this.activity.attendees = this.activity.attendees.filter(
+              (a) => a.username !== this.rootStore.userStore.user?.username
+            );
+            this.activity.isGoing = false;
+            this.activityRegistry.set(this.activity.id, this.activity);
+          }
+        });
+      } catch (error) {
+        toast.error("Problem signing up to activity");
+        console.error(error);
+      } finally {
+        runInAction(() => (this.loading = false));
+      }
+    }
   };
 }
