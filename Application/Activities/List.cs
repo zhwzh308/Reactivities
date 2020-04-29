@@ -5,23 +5,27 @@ using System.Threading.Tasks;
 using System.Threading;
 using Persistence;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace Application.Activities
 {
     public class List
     {
-        public class Query : IRequest<List<Activity>> { }
-        public class Handler : IRequestHandler<Query, List<Activity>>
+        public class Query : IRequest<List<ActivityDto>> { }
+        public class Handler : IRequestHandler<Query, List<ActivityDto>>
         {
             private readonly DataContext _context;
+            private readonly IMapper _mapper;
+
             // private readonly ILogger<List> _logger;
-            public Handler(DataContext context/* , ILogger<List> logger */)
+            public Handler(DataContext context, IMapper mapper/* , ILogger<List> logger */)
             {
                 // _logger = logger;
                 _context = context;
+                _mapper = mapper;
             }
 
-            public async Task<List<Activity>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<List<ActivityDto>> Handle(Query request, CancellationToken cancellationToken)
             {
                 /*
                 try
@@ -38,7 +42,8 @@ namespace Application.Activities
                     _logger.LogInformation("Task was cancelled");
                 } */
                 var activities = await _context.Activities.ToListAsync();
-                return activities;
+
+                return _mapper.Map<List<Activity>, List<ActivityDto>>(activities);
             }
         }
     }
