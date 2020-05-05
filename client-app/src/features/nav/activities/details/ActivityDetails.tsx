@@ -19,24 +19,25 @@ export const ActivityDetails: React.FC<RouteComponentProps<
   const { activityStore } = useContext(RootStoreContext);
   const { activity, loadActivity, loadingInitial } = activityStore;
   useEffect(() => {
-    loadActivity(match.params.id);
+    const id = match.params.id;
+    loadActivity(id);
   }, [loadActivity, match.params.id, history]);
   if (loadingInitial) {
     return <LoadingComponent content="Loading activity..." />;
   }
-  if (!activity) {
-    return <h2>Activity not found</h2>;
+  if (activity) {
+    return (
+      <Grid>
+        <Grid.Column width={10}>
+          <ActivityDetailedHeader activity={activity} />
+          <ActivityDetailedInfo activity={activity} />
+          <ActivityDetailedChat />
+        </Grid.Column>
+        <Grid.Column width={6}>
+          <ActivityDetailedSidebar attendees={activity.attendees} />
+        </Grid.Column>
+      </Grid>
+    );
   }
-  return (
-    <Grid>
-      <Grid.Column width={10}>
-        <ActivityDetailedHeader activity={activity} />
-        <ActivityDetailedInfo activity={activity} />
-        <ActivityDetailedChat />
-      </Grid.Column>
-      <Grid.Column width={6}>
-        <ActivityDetailedSidebar attendees={activity.attendees} />
-      </Grid.Column>
-    </Grid>
-  );
+  return <h2>Activity not found</h2>;
 });
