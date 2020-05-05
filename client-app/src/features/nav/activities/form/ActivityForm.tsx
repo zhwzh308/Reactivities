@@ -45,7 +45,6 @@ export const ActivityForm: React.FC<RouteComponentProps<
   const { submitting, loadActivity } = activityStore;
   const [activity, setActivity] = useState(new ActivityFormValues());
   const handleFinalFormSubmit = (values: any) => {
-    console.log(values);
     const dateAndTime = combineDateAndTime(values.date, values.time);
     const { date, time, ...activity } = values;
     activity.date = dateAndTime;

@@ -88,6 +88,7 @@ const User = {
 const Profiles = {
   get: (username: string): Promise<IProfile> =>
     requests.get(`/profiles/${username}`),
+  update: (profile: Partial<IProfile>) => requests.put("/profiles", profile),
   uploadPhoto: (photo: Blob): Promise<IPhoto> =>
     requests.postForm(`/photos`, photo),
   setMainPhoto: (id: string) => requests.post(`/photos/${id}/setMain`, {}),

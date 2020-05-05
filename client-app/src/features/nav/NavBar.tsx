@@ -4,7 +4,7 @@ import { observer } from "mobx-react-lite";
 import { NavLink, Link } from "react-router-dom";
 import { RootStoreContext } from "../../app/stores/rootStore";
 
-export const NavBar = observer(() => {
+export const NavBar: React.FC = observer(() => {
   const { userStore } = useContext(RootStoreContext);
   const { user, logout } = userStore;
   return (

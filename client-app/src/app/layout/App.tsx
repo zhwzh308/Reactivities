@@ -19,6 +19,7 @@ import { RootStoreContext } from "../stores/rootStore";
 import { LoadingComponent } from "./LoadingComponent";
 import { ModalContainer } from "../common/modals/ModalContainer";
 import { ProfilePage } from "../../features/profiles/ProfilePage";
+import { ProfileEditForm } from "../../features/profiles/ProfileEditForm";
 
 const App: React.FC<RouteComponentProps> = ({ location }) => {
   const { commonStore, userStore } = useContext(RootStoreContext);
@@ -56,6 +57,11 @@ const App: React.FC<RouteComponentProps> = ({ location }) => {
                     component={ActivityForm}
                   />
                   <Route path="/profile/:username" component={ProfilePage} />
+                  <Route
+                    key={location.key}
+                    path="/editProfile"
+                    component={ProfileEditForm}
+                  />
                   <Route component={NotFound} />
                 </Switch>
               </Container>

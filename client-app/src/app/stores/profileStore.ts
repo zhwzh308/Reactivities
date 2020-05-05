@@ -40,6 +40,24 @@ export default class ProfileStore {
       );
     }
   };
+  @action editProfile = async (profile: IProfile) => {
+    this.loadingProfile = true;
+    try {
+      await agent.Profiles.update(profile);
+      runInAction(() => {
+        this.profile = {...this.profile!, ...profile};
+        const { displayName } = profile;
+        if (this.isCurrentUser) {
+          this.rootStore.userStore.user!.displayName = displayName;
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      toast.error("Error updating profile");
+    } finally {
+      runInAction(() => (this.loadingProfile = false));
+    }
+  };
   @action setMainPhoto = async (photo: IPhoto) => {
     this.loading = true;
     try {
