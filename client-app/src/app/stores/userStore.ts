@@ -32,7 +32,7 @@ export default class UserStore {
   @action getUser = async () => {
     try {
       const user = await agent.User.current();
-      runInAction(() => (this.user = user));
+      runInAction("Done getUser", () => (this.user = user));
     } catch (error) {
       console.error(error);
     }

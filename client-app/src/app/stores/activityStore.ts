@@ -28,33 +28,34 @@ export default class ActivityStore {
   @observable target = "";
   @observable.ref hubConnection: HubConnection | null = null;
   @action createHubConnection = (activityId: string) => {
-    const hc = new HubConnectionBuilder()
+    this.hubConnection = new HubConnectionBuilder()
       .withUrl("http://localhost:5000/chat", {
         accessTokenFactory: () => this.rootStore.commonStore.token!,
       })
       .configureLogging(LogLevel.Information)
       .build();
-    this.hubConnection = hc;
-    hc.start()
-      .then(() => console.log(hc.state))
+    this.hubConnection
+      .start()
+      .then(() => console.log(this.hubConnection?.state))
       .then(() => {
         console.log("Attempting to join group");
-        hc.invoke("AddToGroup", activityId);
+        this.hubConnection?.invoke("AddToGroup", activityId).then(() => {
+          this.hubConnection?.on("ReceiveComment", (c) => {
+            runInAction(() => this.activity!.comments.push(c));
+          });
+          this.hubConnection?.on("Send", (msg) => {
+            toast.info(msg);
+          });
+        });
       })
       .catch(console.error);
-    hc.on("ReceiveComment", (c) => {
-      runInAction(() => this.activity!.comments.push(c));
-    });
-    hc.on("Send", (msg) => {
-      toast.info(msg);
-    });
   };
   @action stopConnection = () => {
     if (this.hubConnection) {
       this.hubConnection
         .invoke("RemoveFromGroup", this.activity?.id)
         .then(this.hubConnection.stop)
-        .then(() => console.log('Connection stopped'))
+        .then(() => console.log("Connection stopped"))
         .catch(console.error);
     }
   };

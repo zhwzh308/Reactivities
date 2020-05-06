@@ -40,7 +40,9 @@ export const ActivityDetailedSidebar: React.FC<IProps> = observer(({ attendees }
                 <Item.Header as="h3">
                   <Link to={`/profile/${a.username}`}>{a.displayName}</Link>
                 </Item.Header>
-                <Item.Extra style={{ color: "orange" }}>Following</Item.Extra>
+                {a.following && (
+                  <Item.Extra style={{ color: "orange" }}>Following</Item.Extra>
+                )}
               </Item.Content>
             </Item>
           ))}
