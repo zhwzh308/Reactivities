@@ -2,7 +2,7 @@ import React, { Fragment, useContext } from "react";
 import { Menu, Header } from "semantic-ui-react";
 import { Calendar } from "react-widgets";
 import { observer } from "mobx-react-lite";
-import { RootStoreContext } from "../../../../app/stores/rootStore";
+import { RootStoreContext } from "../../../app/stores/rootStore";
 
 const ActivityFilters: React.FC = () => {
   const rootStore = useContext(RootStoreContext);

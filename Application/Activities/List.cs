@@ -27,7 +27,7 @@ namespace Application.Activities
                 Offset = offset;
                 IsGoing = isGoing;
                 IsHost = isHost;
-                StartDate = startDate ?? DateTime.Now;
+                StartDate = startDate ?? DateTime.UtcNow;
             }
             public int? Limit { get; set; }
             public int? Offset { get; set; }

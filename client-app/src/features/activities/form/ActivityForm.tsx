@@ -4,20 +4,20 @@ import { observer } from "mobx-react-lite";
 import { v4 as uuid } from "uuid";
 import { RouteComponentProps } from "react-router-dom";
 import { Form as FinalForm, Field } from "react-final-form";
-import { ActivityFormValues } from "../../../../app/models/activity";
-import { TextInput } from "../../../../app/common/form/TextInput";
-import { TextAreaInput } from "../../../../app/common/form/TextAreaInput";
-import { SelectInput } from "../../../../app/common/form/SelectInput";
-import { category } from "../../../../app/common/options/categoryOptions";
-import { DateInput } from "../../../../app/common/form/DateInput";
-import { combineDateAndTime } from "../../../../app/common/util/util";
+import { ActivityFormValues } from "../../../app/models/activity";
+import { TextInput } from "../../../app/common/form/TextInput";
+import { TextAreaInput } from "../../../app/common/form/TextAreaInput";
+import { SelectInput } from "../../../app/common/form/SelectInput";
+import { category } from "../../../app/common/options/categoryOptions";
+import { DateInput } from "../../../app/common/form/DateInput";
+import { combineDateAndTime } from "../../../app/common/util/util";
 import {
   combineValidators,
   isRequired,
   composeValidators,
   hasLengthGreaterThan,
 } from "revalidate";
-import { RootStoreContext } from "../../../../app/stores/rootStore";
+import { RootStoreContext } from "../../../app/stores/rootStore";
 
 const validate = combineValidators({
   title: isRequired({ message: "The event title is required" }),

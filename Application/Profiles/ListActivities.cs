@@ -42,13 +42,13 @@ namespace Application.Profiles
                 switch (request.Predicate)
                 {
                     case "past":
-                        queryable = queryable.Where(a => a.Activity.Date <= DateTime.Now);
+                        queryable = queryable.Where(a => a.Activity.Date <= DateTime.UtcNow);
                         break;
                     case "hosting":
                         queryable = queryable.Where(a => a.IsHost);
                         break;
                     default:
-                        queryable = queryable.Where(a => a.Activity.Date >= DateTime.Now);
+                        queryable = queryable.Where(a => a.Activity.Date >= DateTime.UtcNow);
                         break;
                 }
 

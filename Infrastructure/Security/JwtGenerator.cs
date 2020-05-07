@@ -28,10 +28,11 @@ namespace Infrastructure.Security
             // Generate signing credentials (11-12 chars)
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
 
+            var expiration = DateTime.UtcNow.AddHours(1);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(7),
+                Expires = expiration,
                 SigningCredentials = creds
             };
 

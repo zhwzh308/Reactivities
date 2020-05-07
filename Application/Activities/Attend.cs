@@ -52,7 +52,7 @@ namespace Application.Activities
                 {
                     Activity = activity,
                     AppUser = user,
-                    DateJoined = DateTime.Now,
+                    DateJoined = DateTime.UtcNow,
                     IsHost = false
                 };
                 _context.UserActivities.Add(attendance);
